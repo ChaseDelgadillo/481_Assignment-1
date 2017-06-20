@@ -29,16 +29,55 @@ int main() {
 		}
 	}
 
-	game.printBoard(game.initBoard);
-	cout << endl;
-	game.printBoard(game.targetBoard);
 
-	cout << endl;
-	int hOneCount = game.countingTileSwapsWithBlank();
+	for (int i = 1; i <= 3; i++) {
+		cout << "========================================" << endl;
+		cout << "========================================" << endl;
+		cout << "Algorithm: Steepest-descent hill-climbing" << endl;
+		cout << "Heuristic function: ";
+		switch (i) {
+		case 1:
+			cout << "countingTilesOutOfPlace()" << endl;
+			break;
+		case 2:
+			cout << "distanceTilesOutOfPlace()" << endl;
+			break;
+		case 3:
+			cout << "countingTileSwapsWithBlank()" << endl;
+			break;
+		default:
+			cout << "Invalid heuristic" << endl;
+		}
+		cout << "----------------------------------------" << endl;
+		cout << "Initial board state: " << endl;
+		game.printBoard(game.initBoard);
+		cout << "--------------------" << endl;
+		game.steepestHillClimb(i);
+	}
 
-	cout << hOneCount << endl;
+	for (int i = 1; i <= 3; i++) {
+		cout << "========================================" << endl;
+		cout << "========================================" << endl;
+		cout << "Algorithm: Best-First Search" << endl;
+		cout << "Heuristic function: ";
+		switch (i) {
+		case 1:
+			cout << "countingTilesOutOfPlace()" << endl;
+			break;
+		case 2:
+			cout << "distanceTilesOutOfPlace()" << endl;
+			break;
+		case 3:
+			cout << "countingTileSwapsWithBlank()" << endl;
+			break;
+		default:
+			cout << "Invalid heuristic" << endl;
+		}
+		cout << "----------------------------------------" << endl;
+		cout << "Initial board state: " << endl;
+		game.bestFirstSearch(i);
+	}
 
-	cout << "Win: " << game.checkForWin(game.initBoard, game.targetBoard) << endl;
 
 	infile.close();
 }
