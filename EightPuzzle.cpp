@@ -214,7 +214,12 @@ void EightPuzzle::steepestHillClimb(int heuristic) {
 		victory = checkForWin(tempBoard, targetBoard);
 	}
 
-	cout << "Number of steps: " << steps << endl;
+	if (steps < 100) {
+		cout << "Number of steps: " << steps << endl;
+	}
+	else {
+		cout << "Unable to find a solution." << endl;
+	}
 }
 
 
@@ -714,13 +719,11 @@ void EightPuzzle::bestFirstSearch(int heuristic) {
 				}
 			}
 		}
+		// Put parent in closed
+		closed.push_back(newPSCArr);
 	}
 
 	
-	
-
-
-
 	//// map print
 	//map<string, int>::iterator it = open.begin();
 	/*for (it = open.begin(); it != open.end(); it++) {
@@ -737,14 +740,20 @@ void EightPuzzle::bestFirstSearch(int heuristic) {
 
 
 	//// vector print
-	//for (std::vector<string>::const_iterator i = closed.begin(); i != closed.end(); ++i)
-	//	std::cout << *i << ' ';
+	/*for (std::vector<string>::const_iterator i = closed.begin(); i != closed.end(); ++i)
+		std::cout << *i << ' ';*/
 
 	//// vector remove
 	//vector<string>::iterator result = find(closed.begin(), closed.end(), targetState);
 	//closed.erase(result);
 
-	cout << "Number of steps: " << (steps-1) << endl;
+
+	if (steps < 100) {
+		cout << "Number of steps: " << (steps - 1) << endl;
+	}
+	else {
+		cout << "Unable to find a solution." << endl;
+	}
 }
 
 void EightPuzzle::convert1DTo2DBoard(char state[10], char(&board)[3][3]) {
