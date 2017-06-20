@@ -136,6 +136,7 @@ int EightPuzzle::countingTileSwapsWithBlank(char board[][3]) {
 
 //Steepest Hill Climb
 void EightPuzzle::steepestHillClimb(int heuristic) {
+	ofstream outfile("out.txt", ios::app);
 	bool victory = checkForWin(initBoard, targetBoard);
 
 	
@@ -205,9 +206,9 @@ void EightPuzzle::steepestHillClimb(int heuristic) {
 
 		moveTile(tempBoard, nextMove);
 
-		cout << "Step " << steps << ": " << endl;
+		outfile << "Step " << steps << ": " << endl;
 		printBoard(tempBoard);
-		cout << "--------------------" << endl;
+		outfile << "--------------------" << endl;
 
 		lastMove = nextMove;
 		
@@ -215,10 +216,10 @@ void EightPuzzle::steepestHillClimb(int heuristic) {
 	}
 
 	if (steps < 100) {
-		cout << "Number of steps: " << steps << endl;
+		outfile << "Number of steps: " << steps << endl;
 	}
 	else {
-		cout << "Unable to find a solution." << endl;
+		outfile << "Unable to find a solution." << endl;
 	}
 }
 
@@ -329,6 +330,7 @@ void EightPuzzle::moveTile(char (&board)[3][3], int direction) {
 }
 
 void EightPuzzle::bestFirstSearch(int heuristic) {
+	ofstream outfile("out.txt", ios::app);
 	int steps = 0;
 
 	// Convert initial state to 1d array
@@ -407,8 +409,9 @@ void EightPuzzle::bestFirstSearch(int heuristic) {
 		// Convert Char Array to 2D
 		convert1DTo2DBoard(newPSCArr, newParentState);
 
+		outfile << "Step " << steps << ": " << endl;
 		printBoard(newParentState);
-		cout << endl;
+		outfile << endl;
 
 		if (checkForWin(newParentState, targetBoard)) {
 			break;
@@ -749,10 +752,10 @@ void EightPuzzle::bestFirstSearch(int heuristic) {
 
 
 	if (steps < 100) {
-		cout << "Number of steps: " << (steps - 1) << endl;
+		outfile << "Number of steps: " << (steps - 1) << endl;
 	}
 	else {
-		cout << "Unable to find a solution." << endl;
+		outfile << "Unable to find a solution." << endl;
 	}
 }
 
@@ -795,10 +798,12 @@ bool EightPuzzle::checkForWin(char board1[][3], char board2[][3]) {
 }
 
 void EightPuzzle::printBoard(char board1[][3]) {
+	ofstream outfile("out.txt", ios::app);
+
 	for (int i = 0; i < 3; i++) {
 		for (int j = 0; j < 3; j++) {
-			cout << board1[i][j] << ' ';
+			outfile << board1[i][j] << ' ';
 		}
-		cout << endl;
+		outfile << endl;
 	}
 }

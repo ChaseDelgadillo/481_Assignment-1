@@ -1,7 +1,10 @@
 #include "hw1.h"
 
 int main() {
+	cout << "Running CPSC-481 Assigment 1\n\tBy Chase Delgadillo & Dennis Wu\n" << endl;
 	ifstream infile("in.txt");
+	remove("out.txt");
+	ofstream outfile("out.txt", ios::app);
 	EightPuzzle game;
 
 	if (infile.is_open()) {
@@ -28,56 +31,61 @@ int main() {
 			}
 		}
 	}
-
+	
+	// HEADER
+	outfile << "========================================" << endl;
+	outfile << "========================================" << endl;
+	outfile << "CPSC-481 Assignment 1\nBy Chase Delgadillo & Dennis Wu" << endl;
 
 	for (int i = 1; i <= 3; i++) {
-		cout << "========================================" << endl;
-		cout << "========================================" << endl;
-		cout << "Algorithm: Steepest-descent hill-climbing" << endl;
-		cout << "Heuristic function: ";
+		outfile << "========================================" << endl;
+		outfile << "========================================" << endl;
+		outfile << "Algorithm: Steepest-descent hill-climbing" << endl;
+		outfile << "Heuristic function: ";
 		switch (i) {
 		case 1:
-			cout << "countingTilesOutOfPlace()" << endl;
+			outfile << "countingTilesOutOfPlace()" << endl;
 			break;
 		case 2:
-			cout << "distanceTilesOutOfPlace()" << endl;
+			outfile << "distanceTilesOutOfPlace()" << endl;
 			break;
 		case 3:
-			cout << "countingTileSwapsWithBlank()" << endl;
+			outfile << "countingTileSwapsWithBlank()" << endl;
 			break;
 		default:
-			cout << "Invalid heuristic" << endl;
+			outfile << "Invalid heuristic" << endl;
 		}
-		cout << "----------------------------------------" << endl;
-		cout << "Initial board state: " << endl;
+		outfile << "----------------------------------------" << endl;
+		outfile << "Initial board state: " << endl;
 		game.printBoard(game.initBoard);
-		cout << "--------------------" << endl;
+		outfile << "--------------------" << endl;
 		game.steepestHillClimb(i);
 	}
 
 	for (int i = 1; i <= 3; i++) {
-		cout << "========================================" << endl;
-		cout << "========================================" << endl;
-		cout << "Algorithm: Best-First Search" << endl;
-		cout << "Heuristic function: ";
+		outfile << "========================================" << endl;
+		outfile << "========================================" << endl;
+		outfile << "Algorithm: Best-First Search" << endl;
+		outfile << "Heuristic function: ";
 		switch (i) {
 		case 1:
-			cout << "countingTilesOutOfPlace()" << endl;
+			outfile << "countingTilesOutOfPlace()" << endl;
 			break;
 		case 2:
-			cout << "distanceTilesOutOfPlace()" << endl;
+			outfile << "distanceTilesOutOfPlace()" << endl;
 			break;
 		case 3:
-			cout << "countingTileSwapsWithBlank()" << endl;
+			outfile << "countingTileSwapsWithBlank()" << endl;
 			break;
 		default:
-			cout << "Invalid heuristic" << endl;
+			outfile << "Invalid heuristic" << endl;
 		}
-		cout << "----------------------------------------" << endl;
-		cout << "Initial board state: " << endl;
+		outfile << "----------------------------------------" << endl;
+		outfile << "Initial board state: " << endl;
 		game.bestFirstSearch(i);
 	}
 
 
 	infile.close();
+	outfile.close();
 }
