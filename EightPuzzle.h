@@ -1,14 +1,29 @@
+/*
+ * Class: CPSC-481
+ * Assignment: 1
+ *
+ * Authors: Chase Delgadillo
+ *			Dennis Wu
+ * Date: 6/20/2017
+ *
+ * Implementing a steepest-ascent/-descent hill-climbing algorithm
+ * and A* algorithm to solve the 8-puzzle problem.
+ */
 #pragma once
 #include <iostream>
 #include <vector>
 #include <map>
 #include <string>
 #include <fstream>
+#include <algorithm>
 #include "Tools.h"
 #include "Heuristics.h"
 using namespace std;
 
-
+// CLASS:	EightPuzzle
+//			Holds the board states and algorithms for
+//			finding best path to solution.
+//			Keeps primary tool functions inside.
 class EightPuzzle
 {
 public:
@@ -26,7 +41,6 @@ public:
 
 	// Algorithm 2: Best First Search
 	void bestFirstSearch(int heuristic);
-
 
 	// Initial Board
 	char initBoard[3][3];

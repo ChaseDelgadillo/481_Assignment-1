@@ -1,5 +1,15 @@
+/*
+ * Class: CPSC-481
+ * Assignment: 1
+ *
+ * Authors: Chase Delgadillo
+ *			Dennis Wu
+ * Date: 6/20/2017
+ *
+ * Implementing a steepest-ascent/-descent hill-climbing algorithm
+ * and A* algorithm to solve the 8-puzzle problem.
+ */
 #include "EightPuzzle.h"
-
 
 EightPuzzle::EightPuzzle(){
 }
@@ -8,7 +18,12 @@ EightPuzzle::EightPuzzle(){
 EightPuzzle::~EightPuzzle() {
 }
 
-//Steepest Hill Climb
+// ALGORITHM 1: Steepest-descent hill-climbing
+//		This function uses Steepest-descent hill-climbing
+//		to calculate best path using given heuristic
+// PARAMETERS:	heuristic - integer value that represents
+//							the desired heuristic (1-3)
+// OUTPUT:		void
 void EightPuzzle::steepestHillClimb(int heuristic) {
 	ofstream outfile("out.txt", ios::app);
 	bool victory = checkForWin(initBoard, targetBoard);
@@ -17,7 +32,7 @@ void EightPuzzle::steepestHillClimb(int heuristic) {
 	int lastMove = -1;
 	int nextMove = -1;
 
-	// setup temp
+	// Setup Temp Board to check with
 	char tempBoard[3][3];
 
 	for (int i = 0; i < 3; i++) {
@@ -31,7 +46,7 @@ void EightPuzzle::steepestHillClimb(int heuristic) {
 
 	thePath[0] = initState;
 
-	// WHILE (not solved && steps < 100)
+	// WHILE (not solved && steps < max desired)
 	while (!victory && steps < 100) {
 		steps++;
 
@@ -42,8 +57,6 @@ void EightPuzzle::steepestHillClimb(int heuristic) {
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
 				if (!(tempBoard[i][j] >= '1' && tempBoard[i][j] <= '8')) {
-					//cout << "WERE HERE: " << tempBoard[i][j] << "(" << i << "," << j << ")" << endl;
-
 					// Check swap NORTH
 					if (i > 0 && lastMove != SOUTH) {
 						dirheur[NORTH] = checkChildHeuristic(tempBoard, NORTH, heuristic);
@@ -67,7 +80,6 @@ void EightPuzzle::steepestHillClimb(int heuristic) {
 			}
 		}
 
-
 		int bestHeur = 100;
 		for (int i = 0; i < (sizeof(dirheur) / sizeof(dirheur[0])); i++) {
 			if (dirheur[i] < bestHeur) {
@@ -77,16 +89,10 @@ void EightPuzzle::steepestHillClimb(int heuristic) {
 			}
 		}
 
-		//cout << "\n-------------\nTest\n---------------\n";
-		//printBoard(tempBoard);
-		//cout << "\n-------------\n";
-
+		// Move tile based on best move (lowest heuristic value)
 		moveTile(tempBoard, nextMove);
 
-		//outfile << "Step " << steps << ": " << endl;
-		//printBoard(tempBoard);
-		//outfile << "--------------------" << endl;
-
+		// Add new move to path
 		char tempState[10] = { 0 };
 		convert2DTo1DBoard(tempBoard, tempState);
 
@@ -94,10 +100,10 @@ void EightPuzzle::steepestHillClimb(int heuristic) {
 			thePath[steps] = tempState;
 
 		lastMove = nextMove;
-
 		victory = checkForWin(tempBoard, targetBoard);
 	}
 
+	// Print steps and path if viable
 	if (steps < 100) {
 		outfile << "Number of steps: " << steps << endl;
 
@@ -140,11 +146,20 @@ void EightPuzzle::steepestHillClimb(int heuristic) {
 }
 
 
-//	childTraverse(init, target, dir)
+// TOOL: Evaluate Child Board
+//			This function evaluates given board
+//			towards given direction using the 
+//			desired heuristic.
+// PARAMETERS:	board - char[][] of desired board to check
+//				direction - integer of desired direction 
+//							to check (0-3)
+//				heuristic - integer value that represents
+//							the desired heuristic (1-3)
+// OUTPUT:		int - heuristic value
 int EightPuzzle::checkChildHeuristic(char board[][3], int direction, int heuristic) {
 	int value = 100;
 
-	// setup temp
+	// Setup Temp Board to check with
 	char tempBoard[3][3];
 
 	for (int i = 0; i < 3; i++) {
@@ -153,9 +168,10 @@ int EightPuzzle::checkChildHeuristic(char board[][3], int direction, int heurist
 		}
 	}
 
+	// Swap board to desired direction state
 	moveTile(tempBoard, direction);
 
-	//	check heur of temp
+	// Check heuristic value of board by given heuristic
 	switch (heuristic) {
 	case 1:
 		value = countingTilesOutOfPlace(tempBoard, targetBoard);
@@ -179,9 +195,14 @@ int EightPuzzle::checkChildHeuristic(char board[][3], int direction, int heurist
 }
 
 
-//	makeMove(board, dir)
+// TOOL: Move Tile
+//			This function swaps blank tile on board in 
+//			given direction.
+// PARAMETERS:	board - char[][] of desired board to move in
+//				direction - integer of desired direction
+//							to check (0-3)
+// OUTPUT:		void
 void EightPuzzle::moveTile(char(&board)[3][3], int direction) {
-	//cout << "GIVEN DIRECTION: " << direction << endl;
 	bool moveMade = false;
 	char placeholderTile = ' ';
 
@@ -190,10 +211,10 @@ void EightPuzzle::moveTile(char(&board)[3][3], int direction) {
 			if (moveMade) {
 				break;
 			}
-
+			// Blank Tile Found for moving
 			if (!(board[i][j] >= '1' && board[i][j] <= '8')) {
+				// Move based off selected direction
 				if (direction == NORTH) {
-					//cout << "Working NORTH" << endl;
 					// swap with tile [row-1][]
 					// hold blank
 					placeholderTile = board[i][j];
@@ -205,7 +226,6 @@ void EightPuzzle::moveTile(char(&board)[3][3], int direction) {
 					moveMade = true;
 				}
 				if (direction == SOUTH) {
-					//cout << "Working SOUTH" << endl;
 					// swap with tile[row+1][]
 					// hold blank
 					placeholderTile = board[i][j];
@@ -217,7 +237,6 @@ void EightPuzzle::moveTile(char(&board)[3][3], int direction) {
 					moveMade = true;
 				}
 				if (direction == EAST) {
-					//cout << "Working EAST" << endl;
 					// swap with tile[][col+1]
 					// hold blank
 					placeholderTile = board[i][j];
@@ -229,7 +248,6 @@ void EightPuzzle::moveTile(char(&board)[3][3], int direction) {
 					moveMade = true;
 				}
 				if (direction == WEST) {
-					//cout << "Working WEST" << endl;
 					// swap with tile[][col-1]
 					// hold blank
 					placeholderTile = board[i][j];
@@ -245,6 +263,12 @@ void EightPuzzle::moveTile(char(&board)[3][3], int direction) {
 	}
 }
 
+// ALGORITHM 2: Best-First Search
+//				This function uses Best-First Search to
+//				calculate best path using given heuristic.
+// PARAMETERS:	heuristic - integer value that represents
+//							the desired heuristic (1-3).
+// OUTPUT:		void
 void EightPuzzle::bestFirstSearch(int heuristic) {
 	ofstream outfile("out.txt", ios::app);
 	int steps = 0;
@@ -258,20 +282,13 @@ void EightPuzzle::bestFirstSearch(int heuristic) {
 	char targetState[10] = { 0 };
 	convert2DTo1DBoard(targetBoard, targetState);
 
-
-	// Convert back to 2d
-	/*char newState[3][3];
-	convert1DTo2DBoard(initialState, newState);
-	printBoard(newState);*/
-
-	// Open key-value map
+	// Open :: key-value map
 	pair<string, int> openPair;
 	map<string, int> open;
 	map<string, int>::iterator it = open.begin();
 
-	// Closed strings
+	// Closed :: vector of strings
 	vector<string> closed;
-
 
 	// Get initial state value
 	int initialValue = 100;
@@ -295,20 +312,20 @@ void EightPuzzle::bestFirstSearch(int heuristic) {
 	open.insert(openPair);
 
 	bool victory = checkForWin(initBoard, targetBoard);
+	int newStepMin = 0;
 
+	// Best-First Search loop
 	while (!open.empty() && steps < 100) {
 		steps++;
 
 		string lowestKey = "";
 		int lowestValue = 100;
 		for (it = open.begin(); it != open.end(); it++) {
-			//cout << (*it).first << " " << (*it).second << endl;
 			if ((*it).second < lowestValue) {
 				lowestKey = (*it).first;
 				lowestValue = (*it).second;
 			}
 		}
-		//cout << "Lowest Key: " << lowestKey << "\tValue: " << lowestValue << endl;
 
 		// Remove lowest key
 		it = open.find(lowestKey);
@@ -326,13 +343,11 @@ void EightPuzzle::bestFirstSearch(int heuristic) {
 		// Convert Char Array to 2D
 		convert1DTo2DBoard(newPSCArr, newParentState);
 
-		//outfile << "Step " << steps << ": " << endl;
-		//printBoard(newParentState);
-		//outfile << endl;
-
+		// Add state to path
 		if (steps < 100)
 			thePath[steps] = newPSCArr;
 
+		// Check for victory state
 		if (checkForWin(newParentState, targetBoard)) {
 			break;
 		}
@@ -342,8 +357,8 @@ void EightPuzzle::bestFirstSearch(int heuristic) {
 
 			for (int i = 0; i < 3; i++) {
 				for (int j = 0; j < 3; j++) {
+					// Find blank tile
 					if (!(newParentState[i][j] >= '1' && newParentState[i][j] <= '8')) {
-						//cout << "WERE HERE: " << newParentState[i][j] << "(" << i << "," << j << ")" << endl;
 						char tempChildBoard[3][3];
 						char tempChildState[10] = { 0 };
 
@@ -383,8 +398,7 @@ void EightPuzzle::bestFirstSearch(int heuristic) {
 								childClosedFlag = false;
 							}
 
-							//cout << "Open: " << childOpenFlag << "\tClosed: " << childClosedFlag << endl;
-
+							// Act based on if child is in open or closed
 							if (!childOpenFlag && !childClosedFlag) {
 								// Assign child heuristic value
 								int childValue = 100;
@@ -401,6 +415,7 @@ void EightPuzzle::bestFirstSearch(int heuristic) {
 								default:
 									cout << "No heuristic given" << endl;
 								}
+
 								// Add child to open
 								openPair.first = tempChildState;
 								openPair.second = childValue;
@@ -410,13 +425,9 @@ void EightPuzzle::bestFirstSearch(int heuristic) {
 							if (childOpenFlag) {
 								// If child reached by shorter path
 								//		update to new low path value
-
-
-							}
-							if (childClosedFlag) {
-								// If child reached by shorter path
-								//		remove from closed, add to open
-
+								if (steps < newStepMin) {
+									newStepMin = steps;
+								}
 							}
 						}
 
@@ -456,8 +467,7 @@ void EightPuzzle::bestFirstSearch(int heuristic) {
 								childClosedFlag = false;
 							}
 
-							//cout << "Open: " << childOpenFlag << "\tClosed: " << childClosedFlag << endl;
-
+							// Act based on if child is in open or closed
 							if (!childOpenFlag && !childClosedFlag) {
 								// Assign child heuristic value
 								int childValue = 100;
@@ -483,13 +493,9 @@ void EightPuzzle::bestFirstSearch(int heuristic) {
 							if (childOpenFlag) {
 								// If child reached by shorter path
 								//		update to new low path value
-
-
-							}
-							if (childClosedFlag) {
-								// If child reached by shorter path
-								//		remove from closed, add to open
-
+								if (steps < newStepMin) {
+									newStepMin = steps;
+								}
 							}
 						}
 
@@ -529,8 +535,7 @@ void EightPuzzle::bestFirstSearch(int heuristic) {
 								childClosedFlag = false;
 							}
 
-							//cout << "Open: " << childOpenFlag << "\tClosed: " << childClosedFlag << endl;
-
+							// Act based on if child is in open or closed
 							if (!childOpenFlag && !childClosedFlag) {
 								// Assign child heuristic value
 								int childValue = 100;
@@ -556,13 +561,9 @@ void EightPuzzle::bestFirstSearch(int heuristic) {
 							if (childOpenFlag) {
 								// If child reached by shorter path
 								//		update to new low path value
-
-
-							}
-							if (childClosedFlag) {
-								// If child reached by shorter path
-								//		remove from closed, add to open
-
+								if (steps < newStepMin) {
+									newStepMin = steps;
+								}
 							}
 						}
 
@@ -602,8 +603,7 @@ void EightPuzzle::bestFirstSearch(int heuristic) {
 								childClosedFlag = false;
 							}
 
-							//cout << "Open: " << childOpenFlag << "\tClosed: " << childClosedFlag << endl;
-
+							// Act based on if child is in open or closed
 							if (!childOpenFlag && !childClosedFlag) {
 								// Assign child heuristic value
 								int childValue = 100;
@@ -629,13 +629,9 @@ void EightPuzzle::bestFirstSearch(int heuristic) {
 							if (childOpenFlag) {
 								// If child reached by shorter path
 								//		update to new low path value
-
-
-							}
-							if (childClosedFlag) {
-								// If child reached by shorter path
-								//		remove from closed, add to open
-
+								if (steps < newStepMin) {
+									newStepMin = steps;
+								}
 							}
 						}
 					}
@@ -646,31 +642,7 @@ void EightPuzzle::bestFirstSearch(int heuristic) {
 		closed.push_back(newPSCArr);
 	}
 
-
-	//// map print
-	//map<string, int>::iterator it = open.begin();
-	/*for (it = open.begin(); it != open.end(); it++) {
-	cout << (*it).first << " " << (*it).second << endl;
-	}*/
-
-	//// map change second value
-	//it = open.find(targetState);
-	//it->second = 50;
-
-	//// map erase
-	//it = open.find(targetState);
-	//open.erase(it);
-
-
-	//// vector print
-	/*for (std::vector<string>::const_iterator i = closed.begin(); i != closed.end(); ++i)
-	std::cout << *i << ' ';*/
-
-	//// vector remove
-	//vector<string>::iterator result = find(closed.begin(), closed.end(), targetState);
-	//closed.erase(result);
-
-
+	// Print steps and path if viable
 	if (steps < 100) {
 		outfile << "Number of steps: " << steps - 1 << endl;
 
