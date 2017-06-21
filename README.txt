@@ -27,7 +27,7 @@ Running the tests:
 				4 5 6
 				7 8 x
 
-	2. Run the application: assignment1.exe
+	2. Run the application (assignment1.exe) with an appropriate 'in.txt' file in same folder
 	3. Wait for program to finish executing
 
 Results:
