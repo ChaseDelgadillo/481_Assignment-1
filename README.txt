@@ -6,16 +6,17 @@ Authors: Chase Delgadillo
 
 Date: 6/20/2017
 
-Prerequisites: Windows 10, Visual Studios 2015, Bash
+Prerequisites: Windows 10, Visual Studios 2013, MinGW (or other make program)
 
 Installing: 
-	1. unzip the file into a folder
-	2. open Windows Command Prompt and type: bash
-	3. change directory into the folder containing the un-zipped files (ex: cd Desktop/<location of folder>)
-	4. type in Windows Command Prompt: make
+	1. Download the .zip folder
+	2. Unzip the file into a folder of your choice
+	2. Open Windows Command Prompt or PowerShell
+	3. Change directory into the folder containing the un-zipped files (ex: cd Desktop/<location of folder>)
+	4. Type in Windows Command Prompt: make
 
 Running the tests:
-	1. (optional) locate 'in.txt' text file in the folder to configure initial state and goal state of 8 puzzle board
+	1. (optional) Locate 'in.txt' text file in the folder to configure initial state and goal state of 8 puzzle board
 		
 		in.txt file:
 				4 1 3             <-- initial state
@@ -26,8 +27,8 @@ Running the tests:
 				4 5 6
 				7 8 x
 
-	2. type in Windows Command Prompt: ./assignment1
-	3. wait for program to finish executing
+	2. Run the application: assignment1.exe
+	3. Wait for program to finish executing
 
 Results:
-	1. locate 'out.txt' text file in the folder to see the results
+	1. Locate 'out.txt' text file in the folder to see the results
