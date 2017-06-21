@@ -18,7 +18,7 @@ Installing:
 Running the tests:
 	1. (optional) Locate 'in.txt' text file in the folder to configure initial state and goal state of 8 puzzle board
 		
-		in.txt file:
+		in.txt file with 1 space between each tile:
 				4 1 3             <-- initial state
 				7 2 5
 				x 8 6
