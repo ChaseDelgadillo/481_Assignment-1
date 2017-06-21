@@ -1,3 +1,14 @@
+/*
+ * Class: CPSC-481
+ * Assignment: 1
+ *
+ * Authors: Chase Delgadillo
+ *			Dennis Wu
+ * Date: 6/20/2017
+ *
+ * Implementing a steepest-ascent/-descent hill-climbing algorithm 
+ * and A* algorithm to solve the 8-puzzle problem.
+ */
 #include "hw1.h"
 
 int main() {
@@ -7,6 +18,7 @@ int main() {
 	ofstream outfile("out.txt", ios::app);
 	EightPuzzle game;
 
+	// Parse input file for the initial board state and target board state
 	if (infile.is_open()) {
 		char c;
 		int i = 0;
@@ -37,6 +49,7 @@ int main() {
 	outfile << "========================================" << endl;
 	outfile << "CPSC-481 Assignment 1\nBy Chase Delgadillo & Dennis Wu" << endl;
 
+	// ALGORITHM 1: Steepest-descent hill-climbing
 	for (int i = 1; i <= 3; i++) {
 		outfile << "========================================" << endl;
 		outfile << "========================================" << endl;
@@ -59,6 +72,7 @@ int main() {
 		game.steepestHillClimb(i);
 	}
 
+	// ALGORITHM 2: Best-First Search
 	for (int i = 1; i <= 3; i++) {
 		outfile << "========================================" << endl;
 		outfile << "========================================" << endl;
