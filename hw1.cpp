@@ -12,7 +12,7 @@
 #include "hw1.h"
 
 int main() {
-	cout << "Running CPSC-481 Assigment 1\n\tBy Chase Delgadillo & Dennis Wu\n" << endl;
+	cout << "Running CPSC-481 Assignment 1\n\tBy Chase Delgadillo & Dennis Wu\n" << endl;
 	ifstream infile("in.txt");
 	remove("out.txt");
 	ofstream outfile("out.txt", ios::app);
