@@ -56,9 +56,6 @@ int main() {
 			outfile << "Invalid heuristic" << endl;
 		}
 		outfile << "----------------------------------------" << endl;
-		outfile << "Initial board state: " << endl;
-		game.printBoard(game.initBoard);
-		outfile << "--------------------" << endl;
 		game.steepestHillClimb(i);
 	}
 
@@ -81,7 +78,6 @@ int main() {
 			outfile << "Invalid heuristic" << endl;
 		}
 		outfile << "----------------------------------------" << endl;
-		outfile << "Initial board state: " << endl;
 		game.bestFirstSearch(i);
 	}
 

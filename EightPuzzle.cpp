@@ -8,138 +8,11 @@ EightPuzzle::EightPuzzle(){
 EightPuzzle::~EightPuzzle() {
 }
 
-int EightPuzzle::countingTilesOutOfPlace(char board[][3]) {
-	int count = 0; 
-
-	for (int i = 0; i < 3; i++) {
-		for (int j = 0; j < 3; j++) {
-			if (board[i][j] != targetBoard[i][j] && (board[i][j] >= '1' && board[i][j] <= '8')) {
-				count++;
-			}
-		}
-	}
-
-	return count;
-}
-
-int EightPuzzle::distanceTilesOutOfPlace(char board[][3]) {
-	int count = 0;
-
-	for (int i = 0; i < 3; i++) {
-		for (int j = 0; j < 3; j++) {
-			if (board[i][j] != targetBoard[i][j] && (board[i][j] >= '1' && board[i][j] <= '8')) {
-				//cout << "out of place : " << board[i][j] << "\trow: " << i << "\tcol: " << j << endl;
-				for (int targetrow = 0; targetrow < 3; targetrow++) {
-					for (int targetcol = 0; targetcol < 3; targetcol++) {
-						if (targetBoard[targetrow][targetcol] == board[i][j]) {
-							//cout << "correct place: " << targetBoard[targetrow][targetcol] << "\trow: " << targetrow << "\tcol: " << targetcol << endl;
-							count += (abs(targetrow - i) + abs(targetcol - j));
-							//cout << (abs(targetrow - i) + abs(targetcol - j)) << endl;
-						}
-					}
-				}
-			}
-		}
-	}
-
-	return count;
-}
-
-int EightPuzzle::countingTileSwapsWithBlank(char board[][3]) {
-	int count = 0;
-	bool victory = checkForWin(board, targetBoard);
-	int rowOne = 0;
-	int colOne = 0;
-	int rowTwo = 0;
-	int colTwo = 0;
-	bool outOfPlace = false;
-	bool inPlace = false;
-	char targetTile = ' ';
-	char placeholderTile = ' ';
-
-	// setup temp
-	char tempBoard[3][3];
-
-	for (int i = 0; i < 3; i++) {
-		for (int j = 0; j < 3; j++) {
-			tempBoard[i][j] = board[i][j];
-		}
-	}
-
-	while (!victory) {
-		outOfPlace = false;
-		inPlace = false;
-
-		for (int i = 0; i < 3; i++) {
-			for (int j = 0; j < 3; j++) {
-				if (tempBoard[i][j] != targetBoard[i][j] && !(tempBoard[i][j] >= '1' && tempBoard[i][j] <= '8')) {
-					rowOne = i;
-					colOne = j;
-					targetTile = targetBoard[i][j];
-					outOfPlace = true;
-				}
-				if (tempBoard[i][j] == targetBoard[i][j] && !(tempBoard[i][j] >= '1' && tempBoard[i][j] <= '8')) {
-					rowOne = i;
-					colOne = j;
-					inPlace = true;
-				}
-			}
-		}
-
-		if (outOfPlace) {
-			// find target tile position on initial board
-			for (int i = 0; i < 3; i++) {
-				for (int j = 0; j < 3; j++) {
-					if (tempBoard[i][j] == targetTile) {
-						rowTwo = i;
-						colTwo = j;
-					}
-				}
-			}
-
-			// Swap blank and target tile
-			placeholderTile = tempBoard[rowOne][colOne];
-			tempBoard[rowOne][colOne] = tempBoard[rowTwo][colTwo];
-			tempBoard[rowTwo][colTwo] = placeholderTile;
-		}
-
-
-		// swap blank with random out of place tile
-		if (inPlace) {
-			// grab out of place tile
-			for (int i = 0; i < 3; i++) {
-				for (int j = 0; j < 3; j++) {
-					if (tempBoard[i][j] != targetBoard[i][j] && (tempBoard[i][j] >= '1' && tempBoard[i][j] <= '8')) {
-						rowTwo = i;
-						colTwo = j;
-					}
-				}
-			}
-
-			// Swap blank and target tile
-			placeholderTile = tempBoard[rowOne][colOne];
-			tempBoard[rowOne][colOne] = tempBoard[rowTwo][colTwo];
-			tempBoard[rowTwo][colTwo] = placeholderTile;
-		}
-
-		// Test print steps to swaps to finish
-		//printBoard(tempBoard);
-		//cout << endl;
-
-
-		count++;
-		victory = checkForWin(tempBoard, targetBoard);
-	}
-
-	return count;
-}
-
 //Steepest Hill Climb
 void EightPuzzle::steepestHillClimb(int heuristic) {
 	ofstream outfile("out.txt", ios::app);
 	bool victory = checkForWin(initBoard, targetBoard);
-
-	
+	string thePath[100];
 	int steps = 0;
 	int lastMove = -1;
 	int nextMove = -1;
@@ -153,6 +26,10 @@ void EightPuzzle::steepestHillClimb(int heuristic) {
 		}
 	}
 
+	char initState[10] = { 0 };
+	convert2DTo1DBoard(initBoard, initState);
+
+	thePath[0] = initState;
 
 	// WHILE (not solved && steps < 100)
 	while (!victory && steps < 100) {
@@ -206,17 +83,56 @@ void EightPuzzle::steepestHillClimb(int heuristic) {
 
 		moveTile(tempBoard, nextMove);
 
-		outfile << "Step " << steps << ": " << endl;
-		printBoard(tempBoard);
-		outfile << "--------------------" << endl;
+		//outfile << "Step " << steps << ": " << endl;
+		//printBoard(tempBoard);
+		//outfile << "--------------------" << endl;
+
+		char tempState[10] = { 0 };
+		convert2DTo1DBoard(tempBoard, tempState);
+
+		if (steps < 100)
+			thePath[steps] = tempState;
 
 		lastMove = nextMove;
-		
+
 		victory = checkForWin(tempBoard, targetBoard);
 	}
 
 	if (steps < 100) {
 		outfile << "Number of steps: " << steps << endl;
+
+		for (int i = 0; i <= steps; i += 5) {
+			if (!thePath[i + 4].empty()) {
+				outfile << thePath[i].substr(0, 3) << "\t" << thePath[i + 1].substr(0, 3) << "\t" << thePath[i + 2].substr(0, 3) << "\t" << thePath[i + 3].substr(0, 3) << "\t" << thePath[i + 4].substr(0, 3) << endl;
+				outfile << thePath[i].substr(3, 3) << "\t" << thePath[i + 1].substr(3, 3) << "\t" << thePath[i + 2].substr(3, 3) << "\t" << thePath[i + 3].substr(3, 3) << "\t" << thePath[i + 4].substr(3, 3) << endl;
+				outfile << thePath[i].substr(6, 3) << "\t" << thePath[i + 1].substr(6, 3) << "\t" << thePath[i + 2].substr(6, 3) << "\t" << thePath[i + 3].substr(6, 3) << "\t" << thePath[i + 4].substr(6, 3) << endl;
+				outfile << endl;
+			}
+			else if (!thePath[i + 3].empty()) {
+				outfile << thePath[i].substr(0, 3) << "\t" << thePath[i + 1].substr(0, 3) << "\t" << thePath[i + 2].substr(0, 3) << "\t" << thePath[i + 3].substr(0, 3) << endl;
+				outfile << thePath[i].substr(3, 3) << "\t" << thePath[i + 1].substr(3, 3) << "\t" << thePath[i + 2].substr(3, 3) << "\t" << thePath[i + 3].substr(3, 3) << endl;
+				outfile << thePath[i].substr(6, 3) << "\t" << thePath[i + 1].substr(6, 3) << "\t" << thePath[i + 2].substr(6, 3) << "\t" << thePath[i + 3].substr(6, 3) << endl;
+				outfile << endl;
+			}
+			else if (!thePath[i + 2].empty()) {
+				outfile << thePath[i].substr(0, 3) << "\t" << thePath[i + 1].substr(0, 3) << "\t" << thePath[i + 2].substr(0, 3) << endl;
+				outfile << thePath[i].substr(3, 3) << "\t" << thePath[i + 1].substr(3, 3) << "\t" << thePath[i + 2].substr(3, 3) << endl;
+				outfile << thePath[i].substr(6, 3) << "\t" << thePath[i + 1].substr(6, 3) << "\t" << thePath[i + 2].substr(6, 3) << endl;
+				outfile << endl;
+			}
+			else if (!thePath[i + 1].empty()) {
+				outfile << thePath[i].substr(0, 3) << "\t" << thePath[i + 1].substr(0, 3) << endl;
+				outfile << thePath[i].substr(3, 3) << "\t" << thePath[i + 1].substr(3, 3) << endl;
+				outfile << thePath[i].substr(6, 3) << "\t" << thePath[i + 1].substr(6, 3) << endl;
+				outfile << endl;
+			}
+			else {
+				outfile << thePath[i].substr(0, 3) << endl;
+				outfile << thePath[i].substr(3, 3) << endl;
+				outfile << thePath[i].substr(6, 3) << endl;
+				outfile << endl;
+			}
+		}
 	}
 	else {
 		outfile << "Unable to find a solution." << endl;
@@ -242,18 +158,18 @@ int EightPuzzle::checkChildHeuristic(char board[][3], int direction, int heurist
 	//	check heur of temp
 	switch (heuristic) {
 	case 1:
-		value = countingTilesOutOfPlace(tempBoard);
+		value = countingTilesOutOfPlace(tempBoard, targetBoard);
 		break;
-	case 2: 
-		value = distanceTilesOutOfPlace(tempBoard);
+	case 2:
+		value = distanceTilesOutOfPlace(tempBoard, targetBoard);
 		break;
 	case 3:
-		value = countingTileSwapsWithBlank(tempBoard);
+		value = countingTileSwapsWithBlank(tempBoard, targetBoard);
 		break;
 	default:
 		cout << "No heuristic given" << endl;
 	}
-	
+
 	// Test child board state
 	//printBoard(tempBoard);
 
@@ -264,7 +180,7 @@ int EightPuzzle::checkChildHeuristic(char board[][3], int direction, int heurist
 
 
 //	makeMove(board, dir)
-void EightPuzzle::moveTile(char (&board)[3][3], int direction) {
+void EightPuzzle::moveTile(char(&board)[3][3], int direction) {
 	//cout << "GIVEN DIRECTION: " << direction << endl;
 	bool moveMade = false;
 	char placeholderTile = ' ';
@@ -332,6 +248,7 @@ void EightPuzzle::moveTile(char (&board)[3][3], int direction) {
 void EightPuzzle::bestFirstSearch(int heuristic) {
 	ofstream outfile("out.txt", ios::app);
 	int steps = 0;
+	string thePath[100];
 
 	// Convert initial state to 1d array
 	char initialState[10] = { 0 };
@@ -341,7 +258,7 @@ void EightPuzzle::bestFirstSearch(int heuristic) {
 	char targetState[10] = { 0 };
 	convert2DTo1DBoard(targetBoard, targetState);
 
-	
+
 	// Convert back to 2d
 	/*char newState[3][3];
 	convert1DTo2DBoard(initialState, newState);
@@ -360,13 +277,13 @@ void EightPuzzle::bestFirstSearch(int heuristic) {
 	int initialValue = 100;
 	switch (heuristic) {
 	case 1:
-		initialValue = countingTilesOutOfPlace(initBoard);
+		initialValue = countingTilesOutOfPlace(initBoard, targetBoard);
 		break;
 	case 2:
-		initialValue = distanceTilesOutOfPlace(initBoard);
+		initialValue = distanceTilesOutOfPlace(initBoard, targetBoard);
 		break;
 	case 3:
-		initialValue = countingTileSwapsWithBlank(initBoard);
+		initialValue = countingTileSwapsWithBlank(initBoard, targetBoard);
 		break;
 	default:
 		cout << "No heuristic given" << endl;
@@ -378,7 +295,7 @@ void EightPuzzle::bestFirstSearch(int heuristic) {
 	open.insert(openPair);
 
 	bool victory = checkForWin(initBoard, targetBoard);
-	
+
 	while (!open.empty() && steps < 100) {
 		steps++;
 
@@ -399,7 +316,7 @@ void EightPuzzle::bestFirstSearch(int heuristic) {
 
 		// New Parent State 2D
 		char newParentState[3][3];
-		
+
 		// New Parent State String to Char Array
 		char newPSCArr[10] = { 0 };
 		for (int i = 0; i < 9; i++) {
@@ -409,9 +326,12 @@ void EightPuzzle::bestFirstSearch(int heuristic) {
 		// Convert Char Array to 2D
 		convert1DTo2DBoard(newPSCArr, newParentState);
 
-		outfile << "Step " << steps << ": " << endl;
-		printBoard(newParentState);
-		outfile << endl;
+		//outfile << "Step " << steps << ": " << endl;
+		//printBoard(newParentState);
+		//outfile << endl;
+
+		if (steps < 100)
+			thePath[steps] = newPSCArr;
 
 		if (checkForWin(newParentState, targetBoard)) {
 			break;
@@ -470,13 +390,13 @@ void EightPuzzle::bestFirstSearch(int heuristic) {
 								int childValue = 100;
 								switch (heuristic) {
 								case 1:
-									childValue = countingTilesOutOfPlace(tempChildBoard);
+									childValue = countingTilesOutOfPlace(tempChildBoard, targetBoard);
 									break;
 								case 2:
-									childValue = distanceTilesOutOfPlace(tempChildBoard);
+									childValue = distanceTilesOutOfPlace(tempChildBoard, targetBoard);
 									break;
 								case 3:
-									childValue = countingTileSwapsWithBlank(tempChildBoard);
+									childValue = countingTileSwapsWithBlank(tempChildBoard, targetBoard);
 									break;
 								default:
 									cout << "No heuristic given" << endl;
@@ -543,13 +463,13 @@ void EightPuzzle::bestFirstSearch(int heuristic) {
 								int childValue = 100;
 								switch (heuristic) {
 								case 1:
-									childValue = countingTilesOutOfPlace(tempChildBoard);
+									childValue = countingTilesOutOfPlace(tempChildBoard, targetBoard);
 									break;
 								case 2:
-									childValue = distanceTilesOutOfPlace(tempChildBoard);
+									childValue = distanceTilesOutOfPlace(tempChildBoard, targetBoard);
 									break;
 								case 3:
-									childValue = countingTileSwapsWithBlank(tempChildBoard);
+									childValue = countingTileSwapsWithBlank(tempChildBoard, targetBoard);
 									break;
 								default:
 									cout << "No heuristic given" << endl;
@@ -616,13 +536,13 @@ void EightPuzzle::bestFirstSearch(int heuristic) {
 								int childValue = 100;
 								switch (heuristic) {
 								case 1:
-									childValue = countingTilesOutOfPlace(tempChildBoard);
+									childValue = countingTilesOutOfPlace(tempChildBoard, targetBoard);
 									break;
 								case 2:
-									childValue = distanceTilesOutOfPlace(tempChildBoard);
+									childValue = distanceTilesOutOfPlace(tempChildBoard, targetBoard);
 									break;
 								case 3:
-									childValue = countingTileSwapsWithBlank(tempChildBoard);
+									childValue = countingTileSwapsWithBlank(tempChildBoard, targetBoard);
 									break;
 								default:
 									cout << "No heuristic given" << endl;
@@ -689,13 +609,13 @@ void EightPuzzle::bestFirstSearch(int heuristic) {
 								int childValue = 100;
 								switch (heuristic) {
 								case 1:
-									childValue = countingTilesOutOfPlace(tempChildBoard);
+									childValue = countingTilesOutOfPlace(tempChildBoard, targetBoard);
 									break;
 								case 2:
-									childValue = distanceTilesOutOfPlace(tempChildBoard);
+									childValue = distanceTilesOutOfPlace(tempChildBoard, targetBoard);
 									break;
 								case 3:
-									childValue = countingTileSwapsWithBlank(tempChildBoard);
+									childValue = countingTileSwapsWithBlank(tempChildBoard, targetBoard);
 									break;
 								default:
 									cout << "No heuristic given" << endl;
@@ -726,11 +646,11 @@ void EightPuzzle::bestFirstSearch(int heuristic) {
 		closed.push_back(newPSCArr);
 	}
 
-	
+
 	//// map print
 	//map<string, int>::iterator it = open.begin();
 	/*for (it = open.begin(); it != open.end(); it++) {
-		cout << (*it).first << " " << (*it).second << endl;
+	cout << (*it).first << " " << (*it).second << endl;
 	}*/
 
 	//// map change second value
@@ -744,7 +664,7 @@ void EightPuzzle::bestFirstSearch(int heuristic) {
 
 	//// vector print
 	/*for (std::vector<string>::const_iterator i = closed.begin(); i != closed.end(); ++i)
-		std::cout << *i << ' ';*/
+	std::cout << *i << ' ';*/
 
 	//// vector remove
 	//vector<string>::iterator result = find(closed.begin(), closed.end(), targetState);
@@ -752,58 +672,42 @@ void EightPuzzle::bestFirstSearch(int heuristic) {
 
 
 	if (steps < 100) {
-		outfile << "Number of steps: " << (steps - 1) << endl;
-	}
-	else {
-		outfile << "Unable to find a solution." << endl;
-	}
-}
+		outfile << "Number of steps: " << steps - 1 << endl;
 
-void EightPuzzle::convert1DTo2DBoard(char state[10], char(&board)[3][3]) {
-	int temprow = -1;
-	int tempcol = 0;
-
-	for (int i = 0; i < 9; i++) {
-		tempcol = i % 3;
-		if (tempcol == 0) {
-			temprow++;
-		}
-
-		//cout << "[" << temprow << "][" << tempcol << "]" << endl;
-		board[temprow][tempcol] = state[i];
-	}
-}
-
-void EightPuzzle::convert2DTo1DBoard(char board[3][3], char(&state)[10]) {
-	for (int i = 0; i < 3; i++) {
-		for (int j = 0; j < 3; j++) {
-			state[((i * 3) + j)] = board[i][j];
-		}
-	}
-}
-
-
-bool EightPuzzle::checkForWin(char board1[][3], char board2[][3]) {
-	bool victory = true;
-
-	for (int i = 0; i < 3; i++) {
-		for (int j = 0; j < 3; j++) {
-			if (board1[i][j] != board2[i][j]) {
-				victory = false;
+		for (int i = 1; i <= steps; i += 5) {
+			if (!thePath[i + 4].empty()) {
+				outfile << thePath[i].substr(0, 3) << "\t" << thePath[i + 1].substr(0, 3) << "\t" << thePath[i + 2].substr(0, 3) << "\t" << thePath[i + 3].substr(0, 3) << "\t" << thePath[i + 4].substr(0, 3) << endl;
+				outfile << thePath[i].substr(3, 3) << "\t" << thePath[i + 1].substr(3, 3) << "\t" << thePath[i + 2].substr(3, 3) << "\t" << thePath[i + 3].substr(3, 3) << "\t" << thePath[i + 4].substr(3, 3) << endl;
+				outfile << thePath[i].substr(6, 3) << "\t" << thePath[i + 1].substr(6, 3) << "\t" << thePath[i + 2].substr(6, 3) << "\t" << thePath[i + 3].substr(6, 3) << "\t" << thePath[i + 4].substr(6, 3) << endl;
+				outfile << endl;
+			}
+			else if (!thePath[i + 3].empty()) {
+				outfile << thePath[i].substr(0, 3) << "\t" << thePath[i + 1].substr(0, 3) << "\t" << thePath[i + 2].substr(0, 3) << "\t" << thePath[i + 3].substr(0, 3) << endl;
+				outfile << thePath[i].substr(3, 3) << "\t" << thePath[i + 1].substr(3, 3) << "\t" << thePath[i + 2].substr(3, 3) << "\t" << thePath[i + 3].substr(3, 3) << endl;
+				outfile << thePath[i].substr(6, 3) << "\t" << thePath[i + 1].substr(6, 3) << "\t" << thePath[i + 2].substr(6, 3) << "\t" << thePath[i + 3].substr(6, 3) << endl;
+				outfile << endl;
+			}
+			else if (!thePath[i + 2].empty()) {
+				outfile << thePath[i].substr(0, 3) << "\t" << thePath[i + 1].substr(0, 3) << "\t" << thePath[i + 2].substr(0, 3) << endl;
+				outfile << thePath[i].substr(3, 3) << "\t" << thePath[i + 1].substr(3, 3) << "\t" << thePath[i + 2].substr(3, 3) << endl;
+				outfile << thePath[i].substr(6, 3) << "\t" << thePath[i + 1].substr(6, 3) << "\t" << thePath[i + 2].substr(6, 3) << endl;
+				outfile << endl;
+			}
+			else if (!thePath[i + 1].empty()) {
+				outfile << thePath[i].substr(0, 3) << "\t" << thePath[i + 1].substr(0, 3) << endl;
+				outfile << thePath[i].substr(3, 3) << "\t" << thePath[i + 1].substr(3, 3) << endl;
+				outfile << thePath[i].substr(6, 3) << "\t" << thePath[i + 1].substr(6, 3) << endl;
+				outfile << endl;
+			}
+			else {
+				outfile << thePath[i].substr(0, 3) << endl;
+				outfile << thePath[i].substr(3, 3) << endl;
+				outfile << thePath[i].substr(6, 3) << endl;
+				outfile << endl;
 			}
 		}
 	}
-
-	return victory;
-}
-
-void EightPuzzle::printBoard(char board1[][3]) {
-	ofstream outfile("out.txt", ios::app);
-
-	for (int i = 0; i < 3; i++) {
-		for (int j = 0; j < 3; j++) {
-			outfile << board1[i][j] << ' ';
-		}
-		outfile << endl;
+	else {
+		outfile << "Unable to find a solution." << endl;
 	}
 }
